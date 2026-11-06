@@ -6,6 +6,7 @@ import math
 import sqlite3
 import time
 import uuid
+from contextlib import closing
 from pathlib import Path
 from typing import NamedTuple
 
@@ -26,7 +27,9 @@ class SlidingWindow:
             raise ValueError("An on-disk database and a positive limit are required")
         self.path, self.limit, self.clock = path, limit, clock
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        # Connection.__exit__ commits/rolls back; it does not close the handle.
+        # Close deterministically so later forked workers cannot inherit it.
+        with closing(self._connect()) as db, db:
             db.execute("PRAGMA journal_mode=WAL")
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS ledger (
@@ -52,7 +55,7 @@ class SlidingWindow:
         if type(tokens) is not int or tokens < 1:
             raise ValueError("tokens must be a positive integer")
         tenant_hash = hashlib.sha256(tenant.encode()).hexdigest()
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             now = self._now(db)
             db.execute("DELETE FROM ledger WHERE expires<=?", (now,))
@@ -78,7 +81,7 @@ class SlidingWindow:
     def _settle(self, reservation: Reservation, actual: int) -> None:
         if type(actual) is not int or not 0 <= actual <= reservation.tokens:
             raise ValueError("Usage outside reservation")
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             now = self._now(db)
             # Idempotent, one-way transition. Duplicate cleanup cannot credit twice.

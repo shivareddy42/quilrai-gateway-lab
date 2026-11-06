@@ -2,6 +2,7 @@ import asyncio
 import json
 import sqlite3
 import time
+from contextlib import closing
 
 import httpx
 import pytest
@@ -18,7 +19,7 @@ def success(total=4):
 
 
 def used(path):
-    with sqlite3.connect(path) as db:
+    with closing(sqlite3.connect(path)) as db, db:
         return db.execute("SELECT COALESCE(SUM(tokens),0) FROM ledger").fetchone()[0]
 
 
@@ -257,7 +258,7 @@ async def test_database_outage_returns_sanitized_503(gateway, viewer):
         client,
         app,
     ):
-        with sqlite3.connect(app.state.router.limiter.path) as db:
+        with closing(sqlite3.connect(app.state.router.limiter.path)) as db, db:
             db.execute("BEGIN IMMEDIATE")
             response = await client.post(
                 "/v1/completions", headers=viewer, json={"prompt": "hello"}

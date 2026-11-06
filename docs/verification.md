@@ -5,12 +5,12 @@ Verified locally on **November 5, 2026**, using macOS on Apple Silicon. These ar
 | Check | Observed result |
 | :--- | :--- |
 | Locked install, Python 3.11.18 | Passed |
-| Full suite, Python 3.11.18 | 148 passed in 6.61 seconds |
+| Full suite, Python 3.11.18 | 151 passed in 6.02 seconds |
 | Locked install, Python 3.12.15 | Passed |
-| Full suite with subprocess coverage, Python 3.12.15 | 148 passed in 7.01 seconds |
-| Statement coverage, Python 3.12.15 | 723 of 748 executable statements, 96.66% |
+| Full suite with subprocess coverage, Python 3.12.15 | 151 passed in 7.53 seconds |
+| Statement coverage, Python 3.12.15 | 724 of 749 executable statements, 96.66% |
 | Locked install, Python 3.13.18 | Passed |
-| Full suite, Python 3.13.18 | 148 passed in 6.31 seconds |
+| Full suite, Python 3.13.18 | 151 passed in 6.03 seconds |
 | Ruff lint | Passed |
 | Ruff format check | All 20 Python files formatted |
 | Source distribution and wheel build | Passed |
@@ -45,6 +45,6 @@ PASS  Authenticated metrics captured fallback and policy events.
 
 The first-safe-content and fallback timings are single-run local observations with synthetic providers. They are not percentiles, load-test results, or measurements of a real model. They will vary with the machine and scheduler.
 
-Hosted GitHub Actions is configured for Linux and Python 3.11, 3.12, and 3.13. No hosted workflow execution is claimed in this local record. No live paid provider, production traffic, or production deployment was tested.
+Hosted GitHub Actions runs the same checks on Linux and Python 3.11, 3.12, and 3.13. The [workflow history](https://github.com/shivareddy42/quilrai-gateway-lab/actions/workflows/ci.yml) records results for each published commit. The first hosted run exposed an SQLite connection-lifetime defect under fork. Connections now close explicitly after each transaction; a deterministic regression test rejects the original behavior, and process tests exercise fork, spawn, and forkserver where available. No live paid provider, production traffic, or production deployment was tested.
 
 The assessment's Google Doc text export was read and compared with the four-task implementation. The source document and test fixtures contain no actual customer records or real payment operations.

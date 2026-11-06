@@ -57,6 +57,8 @@ The ledger stores reservation ID, hashed tenant identifier, token count, expiry,
 
 The admission inequality is `live_tokens + requested_tokens <= limit`. Reconciliation is a one-way transition guarded by `pending=1`, so repeated cleanup cannot credit a reservation twice.
 
+Every database operation explicitly closes its connection after committing or rolling back. Python's SQLite connection context manager only handles the transaction; `contextlib.closing` owns the handle lifetime. No connection remains stored in the limiter or available for a later fork to inherit. Tests retain tracked connections to verify closure on success and failure, and exercise quota contention with fork, spawn, and forkserver where available.
+
 | Attempt result | Charge | Next step |
 | :--- | :--- | :--- |
 | Valid success | Validated actual total | Return selected provider |
