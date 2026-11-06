@@ -1,0 +1,43 @@
+[project]
+name = "quilrai-gateway-lab"
+version = "1.0.0"
+description = "Four assessment tasks, one observable trust boundary."
+requires-python = ">=3.11"
+dependencies = [
+  "mcp==1.26.0",
+  "pydantic>=2.11,<3",
+  "starlette>=0.47,<1",
+  "httpx>=0.28,<1",
+  "uvicorn>=0.35,<1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.4,<10", "pytest-asyncio>=1.1,<2", "pytest-cov>=6,<8", "hypothesis>=6.140,<7", "ruff>=0.14,<1"]
+
+[project.scripts]
+quilr-mcp = "quilr_gateway.mcp_server:main"
+quilr-demo = "quilr_gateway.demo:main"
+
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/quilr_gateway"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["quilr_gateway"]
+patch = ["subprocess"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
