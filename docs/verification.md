@@ -2,6 +2,8 @@
 
 Verified locally on **November 5, 2026**, using macOS on Apple Silicon. These are observed results, not expected output presented as evidence.
 
+The first table records the initial local verification. The contention-test follow-up below records the expanded suite.
+
 | Check | Observed result |
 | :--- | :--- |
 | Locked install, Python 3.11.18 | Passed |
@@ -44,6 +46,12 @@ PASS  Authenticated metrics captured fallback and policy events.
 ```
 
 The first-safe-content and fallback timings are single-run local observations with synthetic providers. They are not percentiles, load-test results, or measurements of a real model. They will vary with the machine and scheduler.
+
+## Contention-test follow-up
+
+A later hosted run hit SQLite's intentional 250ms lock-wait limit in a quota-concurrency test. The test now retries only `SQLITE_BUSY` within a five-second retry budget, while retaining exact admission counts and ledger totals. Separate checks verify immediate fail-closed behavior, zero charge on rejection, single charging after lock release, propagation of non-BUSY errors, and exhaustion of the retry budget. CI repeats the contention checks five times with coverage instrumentation on every Python version.
+
+After this test correction, the full local Python 3.12 suite passed **156 tests in 7.76 seconds**, with **96.66% statement coverage**. The 18 limiter tests also passed separately on Python 3.11 and 3.13. The production database-lock budget remains 250ms; the longer retry allowance belongs to the test client.
 
 Hosted GitHub Actions runs the same checks on Linux and Python 3.11, 3.12, and 3.13. The [workflow history](https://github.com/shivareddy42/quilrai-gateway-lab/actions/workflows/ci.yml) records results for each published commit. The first hosted run exposed an SQLite connection-lifetime defect under fork. Connections now close explicitly after each transaction; a deterministic regression test rejects the original behavior, and process tests exercise fork, spawn, and forkserver where available. No live paid provider, production traffic, or production deployment was tested.
 

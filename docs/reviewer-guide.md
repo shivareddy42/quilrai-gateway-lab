@@ -35,6 +35,8 @@ This uses real child processes and real loopback HTTP, including the three-secon
 | Quota before secondary | Fallback bypassing the tenant's remaining allowance |
 | Invalid usage, lock contention, provider errors | Free retries or internal-detail leakage in failure paths |
 
+The atomic-quota contention tests retry only SQLite `BUSY`, with a five-second retry budget. Shared CI runners may legitimately exceed the production 250ms lock-wait limit. These tests still require the exact number of accepted reservations and exact ledger row/token totals; I/O errors and corruption fail immediately. Separate tests hold a write lock to verify production fails closed without charging quota. CI repeats the contention checks five times per Python version.
+
 ## Operating locally
 
 All supported environment settings are shown in `.env.example`. The app does not load that file implicitly. Use shell exports or `uvicorn --env-file .env` after copying and editing it. The default URLs target the local mock server on port 9001. `/v1/completions` is a small plain-text adapter with required `prompt` and optional `max_tokens`, not a drop-in implementation of a vendor's full chat API.

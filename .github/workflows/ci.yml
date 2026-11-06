@@ -30,5 +30,12 @@ jobs:
         run: make check
       - name: Test, including subprocesses and real network demo
         run: make test
+      - name: Repeat quota contention checks
+        run: |
+          for attempt in 1 2 3 4 5; do
+            uv run --locked pytest -q --cov=quilr_gateway --cov-append --cov-report= \
+              tests/test_limiter.py::test_same_tenant_concurrency_multiple_connections \
+              tests/test_limiter.py::test_real_processes_share_atomic_quota
+          done
       - name: Standalone reviewer demo
         run: uv run --locked quilr-demo
