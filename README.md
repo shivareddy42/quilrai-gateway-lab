@@ -1,10 +1,10 @@
 # Gateway Lab
 
-**Four QuilrAI assessment tasks. One rule: enforce the boundary before crossing it.**
+**Four QuilrAI assessment tasks. 
+Primary rule: enforcing the boundary before crossing it.**
 
 An official-SDK MCP server, an authenticated MCP proxy, a streaming PII guardrail, and a persistent token router. Every provider is mocked locally, so the entire submission runs without a model account or a bill.
 
-Built by **Shiva Reddy** for the AI Solutions Engineer assessment.
 
 ## Start here
 
